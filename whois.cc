@@ -9,22 +9,21 @@
 #include <string>
 #include <iostream>
 
-#define constexpr
 #define nullptr		NULL
 
-constexpr size_t SIZE_IP4	= 32;
-constexpr size_t SIZE_BUFFER	= 1024;
+const size_t SIZE_IP4	= 32;
+const size_t SIZE_BUFFER	= 1024;
 
-constexpr int WHOIS_PORT	= 43;
+const int WHOIS_PORT	= 43;
 
 namespace ERROR{
-	constexpr const char *RESOLVE	= "ERROR:RESOLVE";
-	constexpr const char *CONNECT	= "ERROR:CONNECT";
-	constexpr const char *SEND	= "ERROR:SEND";
-	constexpr const char *RECV	= "ERROR:RECV";
+	const char *RESOLVE	= "ERROR:RESOLVE";
+	const char *CONNECT	= "ERROR:CONNECT";
+	const char *SEND	= "ERROR:SEND";
+	const char *RECV	= "ERROR:RECV";
 }
 
-static std::string whois_query(const char *ip, const char *domain, const char *bind_ip = nullptr);
+static std::string whois_query(const char *ip, int port, const char *domain, const char *bind_ip = nullptr);
 static int print_usage(const char *program);
 
 
@@ -43,12 +42,12 @@ int main(int argc , char *argv[]){
 	const char *domain	= argv[2];
 	const char *bind_ip	= argc >= 3 ? argv[3] : nullptr;
 #endif
-	std::string data = whois_query(server, domain, bind_ip);
+	std::string data = whois_query(server, WHOIS_PORT, domain, bind_ip);
 
 	std::cout << data << '\n';
 }
 
-static bool hostname_to_ip(const char *hostname, char *ip);
+static const char *hostname_to_ip(const char *hostname, char *buffer);
 
 static struct sockaddr_in prepareAddress(const char *ip){
 	struct sockaddr_in addr;
@@ -68,16 +67,15 @@ static struct sockaddr_in prepareAddress(const char *ip, int const port){
 	return addr;
 }
 
-static std::string whois_query(const char *server, const char *domain, const char *bind_ip){
+static std::string whois_query(const char *server, int const port, const char *domain, const char *bind_ip){
 	int sock = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
 
 	char ip[SIZE_IP4];
 
-	if(hostname_to_ip(server , ip) == false)
+	if (! hostname_to_ip(server , ip) )
 		return ERROR::RESOLVE;
 
-
-	struct sockaddr_in dest = prepareAddress(ip, WHOIS_PORT);
+	struct sockaddr_in dest = prepareAddress(ip, port);
 
 	if (bind_ip){
 		struct sockaddr_in localaddr = prepareAddress(bind_ip);
@@ -85,10 +83,8 @@ static std::string whois_query(const char *server, const char *domain, const cha
 		bind(sock, (struct sockaddr *) &localaddr, sizeof(localaddr));
 	}
 
-	if(connect(sock , (const struct sockaddr*) &dest , sizeof(dest) ) < 0){
+	if (connect(sock , (const struct sockaddr*) &dest , sizeof(dest) ) < 0)
 		return ERROR::CONNECT;
-	}
-
 
 	if (
 		send(sock , domain, strlen(domain) , 0) < 0	||
@@ -103,14 +99,9 @@ static std::string whois_query(const char *server, const char *domain, const cha
 	{
 		char buffer[SIZE_BUFFER];
 
-		ssize_t read_size;
-		while( (read_size = recv(sock, buffer, SIZE_BUFFER, 0) ) ){
-			if (read_size < 0)
-				continue;
-			//	return ERROR::RECV;
-
-			data.append(buffer, read_size);
-		}
+		while( ssize_t read_size = recv(sock, buffer, SIZE_BUFFER, 0) )
+			if (read_size > 0)
+				data.append(buffer, read_size);
 	}
 
 	close(sock);
@@ -119,33 +110,33 @@ static std::string whois_query(const char *server, const char *domain, const cha
 }
 
 
-static bool hostname_to_ip(const char *hostname, char *ip){
+static const char *hostname_to_ip(const char *hostname, char *buffer){
 	struct hostent *he = gethostbyname(hostname);
 
-	if ( he == nullptr)
-		return false;
+	if (! he )
+		return nullptr;
 
-	struct in_addr **addr_list = (struct in_addr **) he->h_addr_list;
+	const struct in_addr **addr_list = (const struct in_addr **) he->h_addr_list;
 
 	const struct in_addr *front = addr_list[0];
 
 	if (front){
-		strcpy(ip, inet_ntoa(*front));
+		strcpy(buffer, inet_ntoa(*front));
 
-		return true;
+		return buffer;
 	}
 
-	return false;
+	return nullptr;
 }
 
 
 static int print_usage(const char *program){
 	std::cout
-		<< "Power whois v.0.1"							<< '\n'
+		<< "Power whois v.0.2"							<< '\n'
 		<< "Copyleft 2016-11-22, Nikolay Mihaylov"				<< '\n'
 		<< "Based on: http://www.binarytides.com/c-code-to-perform-ip-whois/"	<< '\n'
 		<< '\n'
-		<< "Usage " << program << " whois.server domain.tld [local_ip]"		<< '\n'
+		<< "Usage " << program << " [whois.server] [domain.tld] [[local_ip]]"	<< '\n'
 		<< '\n';
 
 	return 1;
