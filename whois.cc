@@ -50,27 +50,39 @@ int main(int argc , char *argv[]){
 
 static bool hostname_to_ip(const char *hostname, char *ip);
 
+static struct sockaddr_in prepareAddress(const char *ip){
+	struct sockaddr_in addr;
+	memset( &addr, 0, sizeof(addr) );
+
+	addr.sin_family		= AF_INET;
+	addr.sin_addr.s_addr	= inet_addr(ip);
+
+	return addr;
+}
+
+static struct sockaddr_in prepareAddress(const char *ip, int const port){
+	struct sockaddr_in addr = prepareAddress(ip);
+
+	addr.sin_port		= htons(port);
+
+	return addr;
+}
+
 static std::string whois_query(const char *server, const char *domain, const char *bind_ip){
 	int sock = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
 
-	struct sockaddr_in dest;
-	memset( &dest , 0 , sizeof(dest) );
-	dest.sin_family = AF_INET;
-
 	char ip[SIZE_IP4];
 
-	if(hostname_to_ip(server , ip) == false){
+	if(hostname_to_ip(server , ip) == false)
 		return ERROR::RESOLVE;
-	}
 
-	dest.sin_addr.s_addr = inet_addr( ip );
-	dest.sin_port = htons(WHOIS_PORT);
+
+	struct sockaddr_in dest = prepareAddress(ip, WHOIS_PORT);
 
 	if (bind_ip){
-		dest.sin_family = AF_INET;
-		dest.sin_addr.s_addr = inet_addr(bind_ip);
-		dest.sin_port = 0;
-		bind(sock, (struct sockaddr *) &dest, sizeof(dest));
+		struct sockaddr_in localaddr = prepareAddress(bind_ip);
+
+		bind(sock, (struct sockaddr *) &localaddr, sizeof(localaddr));
 	}
 
 	if(connect(sock , (const struct sockaddr*) &dest , sizeof(dest) ) < 0){
