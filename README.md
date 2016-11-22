@@ -17,6 +17,8 @@ Just do:
 
 Code is optimized to be compiled on CentOS 6.x. This is why it lacks constexpr and similar stuff.
 
+### How to use it?
+
 To start it, just do
 
 >./pwhois
@@ -34,6 +36,7 @@ or
 ### Disclamer
 
 This tool is based on excelent example I found here:
+
 http://www.binarytides.com/c-code-to-perform-ip-whois/
 
 --
