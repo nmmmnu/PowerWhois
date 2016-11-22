@@ -36,6 +36,7 @@ http://www.binarytides.com/c-code-to-perform-ip-whois/
 --
 
 Distribution is GPL.
-Nikolay Mihaylov
-2016-11
 
+Nikolay Mihaylov
+
+2016-11
