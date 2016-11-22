@@ -1,7 +1,5 @@
 # PowerWhois
 
---
-
 Simple Whois Client in C-like C++98
 
 --
@@ -9,6 +7,8 @@ Simple Whois Client in C-like C++98
 ### What is PowerWhois?
 
 PowerWhois is similar to normal whois client, but it allows to specify outgoing IP adress where query will be send from.
+
+--
 
 ### How to build it?
 
@@ -26,6 +26,8 @@ or
 or
 ./pwhois whois.internic.net photonhost.com <outgoing ip>
 
+--
+
 ### Disclamer
 
 This tool is based on excelent example I found here:
@@ -34,8 +36,6 @@ http://www.binarytides.com/c-code-to-perform-ip-whois/
 --
 
 Distribution is GPL.
-
 Nikolay Mihaylov
-
 2016-11
 
