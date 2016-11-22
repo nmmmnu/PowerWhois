@@ -19,8 +19,10 @@ Code is optimized to be compiled on CentOS 6.x
 
 To start it, just do
 >./pwhois
+
 or
 > ./pwhois whois.internic.net photonhost.com
+
 or
 ./pwhois whois.internic.net photonhost.com <outgoing ip>
 
