@@ -1,6 +1,7 @@
-*.exe
 
 a.out
+
+pwhois
 
 test.c
 test.cc

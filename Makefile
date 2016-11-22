@@ -2,7 +2,7 @@
 MYCC		= g++
 
 CF_OPTIM	= -O2
-CF_WARN		= -Wall -Wpedantic -Wdeprecated -Wconversion
+CF_WARN		= -Wall -Wdeprecated -Wconversion
 
 CF_MISC		=
 

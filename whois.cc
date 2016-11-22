@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 
+#define constexpr
+#define nullptr		NULL
 
 constexpr size_t SIZE_IP4	= 32;
 constexpr size_t SIZE_BUFFER	= 1024;
@@ -19,6 +21,7 @@ namespace ERROR{
 	constexpr const char *RESOLVE	= "ERROR:RESOLVE";
 	constexpr const char *CONNECT	= "ERROR:CONNECT";
 	constexpr const char *SEND	= "ERROR:SEND";
+	constexpr const char *RECV	= "ERROR:RECV";
 }
 
 static std::string whois_query(const char *ip, const char *domain, const char *bind_ip = nullptr);
@@ -63,18 +66,17 @@ static std::string whois_query(const char *server, const char *domain, const cha
 	dest.sin_addr.s_addr = inet_addr( ip );
 	dest.sin_port = htons(WHOIS_PORT);
 
+	if (bind_ip){
+		dest.sin_family = AF_INET;
+		dest.sin_addr.s_addr = inet_addr(bind_ip);
+		dest.sin_port = 0;
+		bind(sock, (struct sockaddr *) &dest, sizeof(dest));
+	}
+
 	if(connect(sock , (const struct sockaddr*) &dest , sizeof(dest) ) < 0){
 		return ERROR::CONNECT;
 	}
 
-	if (bind_ip){
-		struct sockaddr_in localaddr;
-
-		localaddr.sin_family = AF_INET;
-		localaddr.sin_addr.s_addr = inet_addr(bind_ip);
-		localaddr.sin_port = 0;
-		bind(sock, (struct sockaddr *) &localaddr, sizeof(localaddr));
-	}
 
 	if (
 		send(sock , domain, strlen(domain) , 0) < 0	||
@@ -90,8 +92,13 @@ static std::string whois_query(const char *server, const char *domain, const cha
 		char buffer[SIZE_BUFFER];
 
 		ssize_t read_size;
-		while( (read_size = recv(sock , buffer , SIZE_BUFFER , 0) ) )
+		while( (read_size = recv(sock, buffer, SIZE_BUFFER, 0) ) ){
+			if (read_size < 0)
+				continue;
+			//	return ERROR::RECV;
+
 			data.append(buffer, read_size);
+		}
 	}
 
 	close(sock);
