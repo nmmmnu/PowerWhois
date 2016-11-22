@@ -1,0 +1,12 @@
+*.exe
+
+a.out
+
+test.c
+test.cc
+
+*.o
+*.d
+
+x.*
+
