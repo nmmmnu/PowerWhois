@@ -41,7 +41,7 @@ int main(int argc , char *argv[]){
 	const char *domain	= argv[2];
 	const char *bind_ip	= argc >= 3 ? argv[3] : nullptr;
 #endif
-	std::string data = whois_query(server, WHOIS_PORT, domain, bind_ip);
+	const std::string data = whois_query(server, WHOIS_PORT, domain, bind_ip);
 
 	std::cout << data << '\n';
 }
