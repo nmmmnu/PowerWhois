@@ -15,7 +15,7 @@ PowerWhois is similar to normal whois client, but it allows to specify outgoing 
 Just do:
 > make
 
-Code is optimized to be compiled on CentOS 6.x
+Code is optimized to be compiled on CentOS 6.x. This is why it lacks constexpr and similar stuff.
 
 To start it, just do
 
@@ -27,7 +27,7 @@ or
 
 or
 
-./pwhois whois.internic.net photonhost.com <outgoing ip>
+> ./pwhois whois.internic.net photonhost.com <outgoing ip>
 
 --
 
