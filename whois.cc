@@ -26,7 +26,6 @@ namespace ERROR{
 static std::string whois_query(const char *ip, int port, const char *domain, const char *bind_ip = nullptr);
 static int print_usage(const char *program);
 
-
 int main(int argc , char *argv[]){
 #if 0
 	(void)print_usage;
@@ -75,12 +74,12 @@ static std::string whois_query(const char *server, int const port, const char *d
 	if (! hostname_to_ip(server , ip) )
 		return ERROR::RESOLVE;
 
-	struct sockaddr_in dest = prepareAddress(ip, port);
+	const struct sockaddr_in dest = prepareAddress(ip, port);
 
 	if (bind_ip){
-		struct sockaddr_in localaddr = prepareAddress(bind_ip);
+		const struct sockaddr_in localaddr = prepareAddress(bind_ip);
 
-		bind(sock, (struct sockaddr *) &localaddr, sizeof(localaddr));
+		bind(sock, (const struct sockaddr *) &localaddr, sizeof(localaddr));
 	}
 
 	if (connect(sock , (const struct sockaddr*) &dest , sizeof(dest) ) < 0)
